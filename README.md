@@ -1,6 +1,6 @@
 ## Active Learning Example: using the digiLab Uncertainty Engine SDK
 
-`mrf_example.ipynb` contains a straight-forward example of automated active learning for a simple 1 input -> 1 output; using candidate nuclear fusion materials as a theme.
+`mrf_example.ipynb` contains a straight-forward example of automated active learning for a simple 1 input -> 1 output; using candidate nuclear fusion material behaviour as a theme.
 
 Set-up:
 - Clone this repo
