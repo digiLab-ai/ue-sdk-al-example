@@ -49,34 +49,40 @@ def simulate(x_values, noise=True):
 
     """
 
-    # # baseline flexural strength (MPa)
-    # sigma0 = 1000
+    # baseline flexural strength (MPa)
+    sigma0 = 1000
 
-    # # Model components
-    # hardening = 0.25 * dpa_array * np.exp(-0.5 * dpa_array)      # early radiation hardening
-    # low_dpa_curvature = 0.3 * dpa_array * np.exp(-dpa_array)     # slight positive concavity
-    # embrittlement = - 0.4 * (1 - np.exp(-0.7 * dpa_array))       # long-term degradation
+    # Noise addition
+    noise_level = 5
 
-    # # Synthetic strength model
-    # model_output = sigma0 * (1 + low_dpa_curvature + hardening + embrittlement)
+    # Model components
+    hardening = 0.25 * x_values * np.exp(-0.5 * x_values)      # early radiation hardening
+    low_dpa_curvature = 0.3 * x_values * np.exp(-x_values)     # slight positive concavity
+    embrittlement = - 0.4 * (1 - np.exp(-0.7 * x_values))       # long-term degradation
 
-    # if noise:
-    #     # Add noise to the model output
-    #     try:
-    #         model_output += np.random.normal(0, 15, size=dpa_array.shape)
-
-    #     except:
-    #         model_output += np.random.normal(0, 15)
-
-    noise_level = 0.1
-
-    y_values = 5 + 0.75*np.sin(2*x_values) + 2*np.sin(0.5*x_values)
+    # Synthetic strength model
+    y_values = sigma0 * (1 + low_dpa_curvature + hardening + embrittlement)
 
     if noise:
-        try: 
-            y_values += np.random.normal(0, noise_level, size=x_values)
+        # Add noise to the model output
+        try:
+            y_values += np.random.normal(0, noise_level, size=x_values.shape)
+
         except:
             y_values += np.random.normal(0, noise_level)
+
+    # Alternativbe ground truth with more complex feature
+    # Ensure that plot bounds are updated for the plot_basic and plot_uncertainty functions
+
+    # noise_level = 0.1
+
+    # y_values = 5 + 0.75*np.sin(2*x_values) + 2*np.sin(0.5*x_values)
+
+    # if noise:
+    #     try: 
+    #         y_values += np.random.normal(0, noise_level, size=x_values)
+    #     except:
+    #         y_values += np.random.normal(0, noise_level)
 
 
     return y_values
@@ -98,13 +104,17 @@ def plot_basic(training_dpa, training_fs):
     # The ground truth is the model without noise by definition
     ground_truth = simulate(dpa, noise=False)
 
+    y_bounds = [550, 1250]
+    # For simulation with more complex features
+    # y_bounds = [3, 9]
+
     plt.figure(figsize=(7,5))
     plt.scatter(training_dpa, training_fs, label="Samples", marker='x', color=INDIGO)
     plt.plot(dpa, ground_truth, linewidth=2, label="Ground Truth", alpha=0.7, color=GREY_80, linestyle='--')
     plt.xlabel("Neutron Irradiation Dose (dpa)")
     plt.ylabel("Flexural Strength (MPa)")
     plt.xlim([-0.5, 5.5])
-    plt.ylim([3, 9])
+    plt.ylim(y_bounds)
     plt.legend()
     plt.grid(True)
     plt.savefig("basic_plot.png")
@@ -152,6 +162,10 @@ def plot_model_uncertainty(training_dpa, training_fs, visualise_means, visualise
 
     plt.figure(figsize=(7,5))
 
+    y_bounds = [550, 1250]
+    # for simulation woth more complex features
+    # y_bounds = [3, 9]
+
     plt.fill_between(visualise_inputs, lower99, upper99, label="99% credible", color=KEPPEL_50)
     plt.fill_between(visualise_inputs, lower67, upper67, label="67% credible", color=KEPPEL)
 
@@ -167,7 +181,7 @@ def plot_model_uncertainty(training_dpa, training_fs, visualise_means, visualise
     plt.xlabel("Neutron Irradiation Dose (dpa)")
     plt.ylabel("Flexural Strength (MPa)")
     plt.xlim([-0.5, 5.5])
-    plt.ylim([3, 9])
+    plt.ylim(y_bounds)
 
     if with_ground_truth:
 
