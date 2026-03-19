@@ -29,9 +29,6 @@ LIGHT_GREY = "#CCCCCC"
 WHITE = "#FFFFFF"
 
 
-# Set this as the default project to point to
-PROJECT_NAME="MRFExample"
-
 ###############################################################
 # Functions for simulation and plotting of training data and UQ
 ###############################################################
@@ -203,7 +200,7 @@ def plot_model_uncertainty(training_dpa, training_fs, visualise_means, visualise
 1.
 ####
 
-def get_dataset(client, resource_name, project_name=PROJECT_NAME):
+def get_dataset(client, resource_name, project_name):
 
     """
 
@@ -229,7 +226,7 @@ def get_dataset(client, resource_name, project_name=PROJECT_NAME):
 2.
 ####
 
-def add_new_sample(client, new_dpa, new_fs, iteration: int, project_name=PROJECT_NAME):
+def add_new_sample(client, new_dpa, new_fs, iteration: int, project_name):
 
     """
 
@@ -243,12 +240,12 @@ def add_new_sample(client, new_dpa, new_fs, iteration: int, project_name=PROJECT
     X_train = get_dataset(
                         client=client
                         , resource_name="x_train_" + str(previous_iteration)
-                        , project_name=PROJECT_NAME
+                        , project_name=project_name
                     )
     y_train = get_dataset(
                         client=client
                         , resource_name="y_train_" + str(previous_iteration)
-                        , project_name=PROJECT_NAME
+                        , project_name=project_name
                     )
 
 
@@ -610,6 +607,7 @@ def recommend_new_sample(client, project_id, iteration, acquisition_function="Po
         , acquisition_function=acquisition_function
         # Constrained to one recommended dpa
         , number_of_points=1
+        , client=client
 
     )
 
@@ -617,6 +615,7 @@ def recommend_new_sample(client, project_id, iteration, acquisition_function="Po
 
         label="Download Recommendation"
         , file=recommend_model.make_handle("recommended_points")
+        , client=client
     )
 
     recommend_graph.add_node(recommend_model)
@@ -632,6 +631,7 @@ def recommend_new_sample(client, project_id, iteration, acquisition_function="Po
             "Recommendation": download_rec.make_handle("file").model_dump()
 
         }
+        , client=client
 
     )
 
